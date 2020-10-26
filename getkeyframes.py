@@ -22,8 +22,10 @@ def extract_frame(file_path, fps, prefix, id):
         count += 1
         # save_status(id, STAGE_EXTRACT, count/allframes)
     cap.release()
+    remove_duplicates(str("img/%s" % id))
 
 
+#去除重复的帧文件
 def remove_duplicates(file_path):
     # 生成图像目录中所有图像的二值hash编码
     encodings = phasher.encode_images(image_dir=file_path)
