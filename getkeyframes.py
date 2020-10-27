@@ -23,7 +23,7 @@ def extract_frame(file_path, fps, prefix, id):
         # save_status(id, STAGE_EXTRACT, count/allframes)
     cap.release()
     remove_duplicates(str("img/%s" % id))
-
+    return file_path + "img/%s" % id
 
 #去除重复的帧文件
 def remove_duplicates(file_path):
@@ -58,5 +58,5 @@ def remove_duplicates(file_path):
 
 
 if __name__ == '__main__':
-    extract_frame("kexuejia.mp4",10,"prefix","test2")
-    remove_duplicates(r"img/test2")
+    extract_frame("benghuaianime.mp4",10,"prefix","test1")
+    # remove_duplicates(r"img/test2")

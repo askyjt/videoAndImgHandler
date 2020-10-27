@@ -30,3 +30,4 @@ def load_model():
                   input_shape=input_shape,
                   pooling='max',
                   include_top=False)
+    return model,graph
