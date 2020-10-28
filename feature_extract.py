@@ -29,8 +29,11 @@ def feature_extract(database_path, model):
     return feats, names
 
 if __name__ == '__main__':
-    feats,names = feature_extract("img/test2", VGGNet())
-    feats = np.array(feats)
-    print(feats.shape)
-    for feat in feats:
-        print(feat)
+    # feats,names = feature_extract("img/test2", VGGNet())
+    # feats = np.array(feats)
+
+    # 初始化一个Milvus类，以后所有的操作都是通过milvus来的
+    milvus = Milvus(host='49.235.115.64',port='19530')
+    # print(feats.shape)
+    # for feat in feats:
+    #     print(feat)
