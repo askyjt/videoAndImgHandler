@@ -1,12 +1,12 @@
-from common import vgg_model_init
+from common import vgg_model_init, const
 from vggnet import VGGNet
 import numpy as np
-from milvus import Milvus, IndexType, MetricType
+import milvus_util
 import os
 
 
 #初始化VGG模型
-model,graph = vgg_model_init.load_model()
+model,graph,sess = vgg_model_init.load_model()
 
 #读取图片路径
 def get_imlist(path):
@@ -28,12 +28,39 @@ def feature_extract(database_path, model):
         print ("extracting feature from image No. %d , %d images in total" %(current, total))
     return feats, names
 
+def save_video_feature(feats):
+    return
+#通过图片查询视频
+def search_video(img_path, table_name):
+    client = milvus_util.milvus_client()
+    feats = []
+    norm_feat = model.vgg_extract_feat(img_path=img_path)
+    feats.append(norm_feat)
+    status, res = milvus_util.search_vectors(client=client, table_name=table_name, vectors=feats, top_k=10)
+
+    return status, res
+
 if __name__ == '__main__':
     # feats,names = feature_extract("img/test2", VGGNet())
     # feats = np.array(feats)
 
     # 初始化一个Milvus类，以后所有的操作都是通过milvus来的
-    milvus = Milvus(host='49.235.115.64',port='19530')
+    # milvus = Milvus(host='49.235.115.64',port='19530')
+
     # print(feats.shape)
     # for feat in feats:
     #     print(feat)
+
+    #创建连接
+    table_name = 'test1'
+    # feats,names = feature_extract("img/test1", VGGNet())
+    client = milvus_util.milvus_client()
+    # milvus_util.create_table(client=client, table_name=table_name, dimension=const.VECTOR_DIMENSION)
+    # milvus_util.insert_vectors(client=client,table_name=table_name,vectors=feats)
+
+    _, vectors = search_video(img_path='img/test2/185839.jpg',table_name=table_name)
+    print(vectors)
+
+
+
+

@@ -14,6 +14,7 @@ def extract_frame(file_path, fps, prefix, id):
     if not os.path.exists(str("img/%s" % id)):
         os.mkdir("img/%s" % id)
     while success:
+        #framerate:24
         if count % (int(framerate / fps)) == 0:
             cv2.imwrite("img/%s/%s%d.jpg" % (id, prefix, frame_count), image)
             print("wrote a extract_frame: " + "img/%s/%s%d.jpg" % (id, prefix, frame_count))
@@ -58,5 +59,4 @@ def remove_duplicates(file_path):
 
 
 if __name__ == '__main__':
-    extract_frame("benghuaianime.mp4",10,"prefix","test1")
-    # remove_duplicates(r"img/test2")
+    extract_frame("kexuejia.mp4",5,"prefix","test2")
