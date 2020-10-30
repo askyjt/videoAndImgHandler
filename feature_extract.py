@@ -1,5 +1,4 @@
 from common import vgg_model_init, const
-from vggnet import VGGNet
 import numpy as np
 import milvus_util
 import os
@@ -30,8 +29,19 @@ def feature_extract(database_path, model):
 
 def save_video_feature(feats):
     return
+
 #通过图片查询视频
-def search_video(img_path, table_name):
+def search_video(img_path, table_name, top_k=10):
+    client = milvus_util.milvus_client()
+    feats = []
+    norm_feat = model.vgg_extract_feat(img_path=img_path)
+    feats.append(norm_feat)
+    status, res = milvus_util.search_vectors(client=client, table_name=table_name, vectors=feats, top_k=10)
+
+    return status, res
+
+#通过图片查询视频
+def search_img(img_path, table_name):
     client = milvus_util.milvus_client()
     feats = []
     norm_feat = model.vgg_extract_feat(img_path=img_path)
@@ -59,7 +69,10 @@ if __name__ == '__main__':
     # milvus_util.insert_vectors(client=client,table_name=table_name,vectors=feats)
 
     _, vectors = search_video(img_path='img/test2/185839.jpg',table_name=table_name)
-    print(vectors)
+    print(vectors.id_array)
+    # print(vectors[0])
+    print(vectors[0][0])
+
 
 
 
