@@ -4,7 +4,7 @@ import milvus_util
 import os
 
 # 初始化VGG模型
-from vggnet import VGGNet
+from vggnet import VGGNet, vgg_extract_feat
 
 model, graph, sess = vgg_model_init.load_model()
 
@@ -31,29 +31,31 @@ def feature_extract(database_path, model):
     return feats, names
 
 
-# 将特征存入milvus
-def save_feature(feats, table_name):
-    client = milvus_util.milvus_client()
-    status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
-    return feats_ids
-
-
 # 通过图片查询视频或图片
 def search_video_or_img(img_path, table_name, top_k=10):
     client = milvus_util.milvus_client()
     feats = []
-    norm_feat = model.vgg_extract_feat(img_path=img_path)
+    norm_feat = vgg_extract_feat(img_path=img_path, model=model, graph=graph, sess=sess)
     feats.append(norm_feat)
     status, res = milvus_util.search_vectors(client=client, table_name=table_name, vectors=feats, top_k=top_k)
     return status, res
 
 
-def save_video_to_milvus(keyframe_path):
+def save_feats_to_milvus(keyframe_path, table_name='video'):
     feats = []
-    norm_feat = model.vgg_extract_feat(img_path=keyframe_path)
+    client = milvus_util.milvus_client()
+    norm_feat = feature_extract(database_path=keyframe_path, model=VGGNet())
     feats.append(norm_feat)
-    feats_ids = save_feature(feats=feats, table_name='video')
-    return feats_ids
+    status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
+    return status, feats_ids
+
+
+def save_feats_batch_to_milvus(keyframe_path, table_name='video'):
+    feats = []
+    client = milvus_util.milvus_client()
+    feats, names = feature_extract(database_path=keyframe_path, model=VGGNet())
+    status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
+    return status, feats_ids, names
 
 
 if __name__ == '__main__':
@@ -69,12 +71,12 @@ if __name__ == '__main__':
 
     # 创建连接
     table_name = 'test1'
-    feats, names = feature_extract("img/test1", VGGNet())
-    client = milvus_util.milvus_client()
+    # feats, names = feature_extract("img/test1", VGGNet())
+    # client = milvus_util.milvus_client()
     # milvus_util.create_table(client=client, table_name=table_name, dimension=const.VECTOR_DIMENSION)
-    status, ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
+    # status, ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
 
-    # _, vectors = search_video_or_img(img_path='img/test2/185839.jpg', table_name=table_name)
-    # # print(vectors.id_array)
-    # print(vectors[0])
-    # print(vectors.shape)
+    _, vectors = search_video_or_img(img_path="img/test2/185839.jpg", table_name="test1")
+    print(vectors.id_array)
+    print(vectors[0])
+    print(vectors.shape)

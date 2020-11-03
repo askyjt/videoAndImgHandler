@@ -24,9 +24,9 @@ def load_model():
 
     global model
 
-    model = VGGNet()
-    # model = VGG16(weights='imagenet',
-    #               input_shape=input_shape,
-    #               pooling='max',
-    #               include_top=False)
+    # model = VGGNet()
+    model = VGG16(weights='imagenet',
+                  input_shape=input_shape,
+                  pooling='max',
+                  include_top=False)
     return model, graph, sess
