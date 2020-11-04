@@ -70,13 +70,13 @@ if __name__ == '__main__':
     #     print(feat)
 
     # 创建连接
-    table_name = 'test1'
+    # table_name = 'test1'
     # feats, names = feature_extract("img/test1", VGGNet())
     # client = milvus_util.milvus_client()
     # milvus_util.create_table(client=client, table_name=table_name, dimension=const.VECTOR_DIMENSION)
     # status, ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
 
-    _, vectors = search_video_or_img(img_path="img/test2/185839.jpg", table_name="test1")
+    _, vectors = search_video_or_img(img_path=r"C:\Users\admin\IdeaProjects\videosearch\src\main\resources\tmp\image\35aaa8d248d54eb3a8fefc906e4c54b3.jpg", table_name="test1")
     print(vectors.id_array)
     print(vectors[0])
     print(vectors.shape)

@@ -72,7 +72,8 @@ class ServerThreading(threading.Thread):
             # 调用神经网络模型处理请求
 
             #打印请求参数
-            print("请求参数： " + re)
+            print("请求参数： ")
+            print(re)
             function = eval(re['method'])
             table_name = re['parameter']['table_name'] if 'table_name' in re['parameter'] else None
             top_k = re['parameter']['top_k'] if 'top_k' in re['parameter'] else None
