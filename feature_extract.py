@@ -44,14 +44,13 @@ def search_video_or_img(img_path, table_name, top_k=10):
 def save_feats_to_milvus(keyframe_path, table_name='video'):
     feats = []
     client = milvus_util.milvus_client()
-    norm_feat = feature_extract(database_path=keyframe_path, model=VGGNet())
+    norm_feat = vgg_extract_feat(img_path=keyframe_path, model=model, graph=graph, sess=sess)
     feats.append(norm_feat)
     status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
     return status, feats_ids
 
 
 def save_feats_batch_to_milvus(keyframe_path, table_name='video'):
-    feats = []
     client = milvus_util.milvus_client()
     feats, names = feature_extract(database_path=keyframe_path, model=VGGNet())
     status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
@@ -69,14 +68,14 @@ if __name__ == '__main__':
     # for feat in feats:
     #     print(feat)
 
-    # 创建连接
-    # table_name = 'test1'
-    # feats, names = feature_extract("img/test1", VGGNet())
-    # client = milvus_util.milvus_client()
+    #创建连接
+    table_name = 'picture'
+    # feats, names = feature_extract("img/test2", VGGNet())
+    client = milvus_util.milvus_client()
     # milvus_util.create_table(client=client, table_name=table_name, dimension=const.VECTOR_DIMENSION)
-    # status, ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
+    status, ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
 
-    _, vectors = search_video_or_img(img_path=r"C:\Users\admin\IdeaProjects\videosearch\src\main\resources\tmp\image\35aaa8d248d54eb3a8fefc906e4c54b3.jpg", table_name="test1")
-    print(vectors.id_array)
-    print(vectors[0])
-    print(vectors.shape)
+    # _, vectors = search_video_or_img(img_path=r"img/test2/184814.jpg", table_name="test1")
+    # print(vectors.id_array)
+    # print(vectors.distance_array)
+    # print(vectors.shape)

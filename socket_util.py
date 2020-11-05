@@ -80,6 +80,7 @@ class ServerThreading(threading.Thread):
 
             if re['parameter'] != None and 'keyframe_path' not in re['parameter']:
                 img_path = re['parameter']['img_path'] if 'img_path' in re['parameter'] else None
+                print("开始搜索")
                 # 进行搜索
                 status, res = function(img_path=img_path, table_name=table_name)
                 print(res[0]._id_list)
@@ -89,7 +90,7 @@ class ServerThreading(threading.Thread):
                 disList = res[0]._dis_list
                 code = status.code
                 msg = status.message
-                result = dict(code=code, msg=msg, data=dict(idList=idList, disList=disList))
+                result = dict(code=code, msg=msg, data=dict(milvusIds=idList, disList=disList))
             else:
                 # 添加数据到milvus
                 if re['method'] == 'save_feats_batch_to_milvus':
@@ -101,12 +102,13 @@ class ServerThreading(threading.Thread):
                     msg = status.message
                     print(feats_ids)
                     print(names)
-                    result = dict(code=code, msg=msg, data=dict(featsIds=feats_ids, names=names))
+                    result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids, names=names))
                 else:
                     status, feats_ids = function(keyframe_path=re['parameter']['keyframe_path'], table_name=table_name)
                     code = status.code
                     msg = status.message
-                    result = dict(code=code, msg=msg)
+                    result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids))
+
 
             sendmsg = json.dumps(result)
             print(sendmsg)
@@ -127,27 +129,6 @@ class ServerThreading(threading.Thread):
 
         pass
 
-
-# class SocketTransferBo:
-#     def __init__(self, method, parameter, result):
-#         self.parameter = parameter
-#         self.method = method
-#         self.result = result
-#
-#     def __str__(self):
-#         return "<method: %s, parameter: %s, result: %s>" % (self.method, self.parameter, self.result)
-#
-#     def __del__(self):
-#         pass
-
-# 将请求转为对象
-# def json2object(d):
-#     # SocketTransferBo(d['method'], d['parameter'], d['result'])
-#     bo = object.__new__(SocketTransferBo)
-#     bo.method = d['method'] if 'method' in d.keys() else None
-#     bo.parameter = d['parameter'] if 'parameter' in d.keys() else None
-#     bo.result = d['result'] if 'result' in d.keys() else None
-#     return bo
 
 
 if __name__ == "__main__":
