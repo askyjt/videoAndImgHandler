@@ -71,14 +71,14 @@ class ServerThreading(threading.Thread):
             re = json.loads(msg)
             # 调用神经网络模型处理请求
 
-            #打印请求参数
+            # 打印请求参数
             print("请求参数： ")
             print(re)
             function = eval(re['method'])
             table_name = re['parameter']['table_name'] if 'table_name' in re['parameter'] else None
             top_k = re['parameter']['top_k'] if 'top_k' in re['parameter'] else None
 
-            if re['parameter'] != None and 'keyframe_path' not in re['parameter']:
+            if re['method'] == 'search_video_or_img':
                 img_path = re['parameter']['img_path'] if 'img_path' in re['parameter'] else None
                 print("开始搜索")
                 # 进行搜索
@@ -94,21 +94,34 @@ class ServerThreading(threading.Thread):
             else:
                 # 添加数据到milvus
                 if re['method'] == 'save_feats_batch_to_milvus':
-                    print("开始添加数据")
-                    status, feats_ids, names = function(keyframe_path=re['parameter']['keyframe_path'], table_name=table_name)
-                    #将名称从byte转为str，避免json转换出错
+                    print("开始批量添加数据")
+                    status, feats_ids, names = function(keyframe_path=re['parameter']['keyframe_path'],
+                                                        table_name=table_name)
+                    # 将名称从byte转为str，避免json转换出错
                     names = [str(name, encoding="utf8") for name in names]
                     code = status.code
                     msg = status.message
                     print(feats_ids)
                     print(names)
                     result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids, names=names))
-                else:
+                elif re['method'] == 'save_feats_to_milvus':
+                    print("开始添加数据")
                     status, feats_ids = function(keyframe_path=re['parameter']['keyframe_path'], table_name=table_name)
                     code = status.code
                     msg = status.message
                     result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids))
-
+                else:
+                    print("开始插入视频数据")
+                    video_path = re['parameter']['video_path'] if 'video_path' in re['parameter'] else None
+                    video_name = re['parameter']['video_name'] if 'video_name' in re['parameter'] else None
+                    status, feats_ids, names, duration_time = function(video_path=video_path, video_name=video_name, table_name=table_name)
+                    # 将名称从byte转为str，避免json转换出错
+                    names = [str(name, encoding="utf8") for name in names]
+                    code = status.code
+                    msg = status.message
+                    print(feats_ids)
+                    print(names)
+                    result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids, names=names, duration_time=duration_time))
 
             sendmsg = json.dumps(result)
             print(sendmsg)
@@ -128,7 +141,6 @@ class ServerThreading(threading.Thread):
     def __del__(self):
 
         pass
-
 
 
 if __name__ == "__main__":
