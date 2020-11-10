@@ -1,3 +1,4 @@
+import re
 from common import vgg_model_init, const
 import numpy as np
 import milvus_util
@@ -31,6 +32,8 @@ def feature_extract(database_path, model):
         current = i + 1
         total = len(img_list)
         print("extracting feature from image No. %d , %d images in total" % (current, total))
+    # 将名称从byte转为str，避免json转换出错
+    names = [str(name, encoding="utf8") for name in names]
     return feats, names
 
 
@@ -62,12 +65,13 @@ def save_feats_batch_to_milvus(keyframe_path, table_name='picture'):
 
 def save_video_to_milvus(video_path, video_name, table_name='video'):
     client = milvus_util.milvus_client()
-    frames_path, duration_time = extract_frame(file_path=video_path, fps=5, video_name=video_name)
+    frames_path, duration = extract_frame(file_path=video_path, fps=5, video_name=video_name)
     frames_path = convert_path(frames_path)
     print(frames_path)
     feats, names = feature_extract(database_path=frames_path, model=VGGNet())
+    duration_time = [re.split('[TF.]',time)[len(re.split('[TF.]',time))-3] for time in names ]
     status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
-    return status, feats_ids, names, duration_time
+    return status, feats_ids, names, duration_time, duration
 
 
 if __name__ == '__main__':

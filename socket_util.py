@@ -76,13 +76,13 @@ class ServerThreading(threading.Thread):
             print(re)
             function = eval(re['method'])
             table_name = re['parameter']['table_name'] if 'table_name' in re['parameter'] else None
-            top_k = re['parameter']['top_k'] if 'top_k' in re['parameter'] else None
+            top_k = int(re['parameter']['top_k'] if 'top_k' in re['parameter'] else None)
 
             if re['method'] == 'search_video_or_img':
                 img_path = re['parameter']['img_path'] if 'img_path' in re['parameter'] else None
                 print("开始搜索")
                 # 进行搜索
-                status, res = function(img_path=img_path, table_name=table_name)
+                status, res = function(img_path=img_path, table_name=table_name, top_k=top_k)
                 print(res[0]._id_list)
                 print(res[0]._dis_list)
                 print(status)
@@ -97,8 +97,6 @@ class ServerThreading(threading.Thread):
                     print("开始批量添加数据")
                     status, feats_ids, names = function(keyframe_path=re['parameter']['keyframe_path'],
                                                         table_name=table_name)
-                    # 将名称从byte转为str，避免json转换出错
-                    names = [str(name, encoding="utf8") for name in names]
                     code = status.code
                     msg = status.message
                     print(feats_ids)
@@ -114,15 +112,12 @@ class ServerThreading(threading.Thread):
                     print("开始插入视频数据")
                     video_path = re['parameter']['video_path'] if 'video_path' in re['parameter'] else None
                     video_name = re['parameter']['video_name'] if 'video_name' in re['parameter'] else None
-                    status, feats_ids, names, duration_time = function(video_path=video_path, video_name=video_name, table_name=table_name)
-                    # 将名称从byte转为str，避免json转换出错
-                    names = [str(name, encoding="utf8") for name in names]
+                    status, feats_ids, names, duration_time, duration = function(video_path=video_path, video_name=video_name, table_name=table_name)
                     code = status.code
                     msg = status.message
                     print(feats_ids)
                     print(names)
-                    result = dict(code=code, msg=msg, data=dict(milvusIds=feats_ids, names=names, duration_time=duration_time))
-
+                    result = dict(code=code, msg=msg,  data=dict(duration=duration, milvusIds=feats_ids, names=names, duration_time=duration_time))
             sendmsg = json.dumps(result)
             print(sendmsg)
             # 发送数据
