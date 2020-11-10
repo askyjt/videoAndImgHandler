@@ -76,8 +76,7 @@ class ServerThreading(threading.Thread):
             print(re)
             function = eval(re['method'])
             table_name = re['parameter']['table_name'] if 'table_name' in re['parameter'] else None
-            top_k = int(re['parameter']['top_k'] if 'top_k' in re['parameter'] else None)
-
+            top_k = re['parameter']['top_k'] if 'top_k' in re['parameter'] else None
             if re['method'] == 'search_video_or_img':
                 img_path = re['parameter']['img_path'] if 'img_path' in re['parameter'] else None
                 print("开始搜索")

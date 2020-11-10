@@ -39,6 +39,7 @@ def feature_extract(database_path, model):
 
 # 通过图片查询视频或图片
 def search_video_or_img(img_path, table_name, top_k=10):
+    top_k = int(top_k)
     client = milvus_util.milvus_client()
     feats = []
     norm_feat = vgg_extract_feat(img_path=img_path, model=model, graph=graph, sess=sess)
