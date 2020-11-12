@@ -3,6 +3,7 @@ import re
 import cv2
 from imagededup.methods import PHash
 from imagededup.utils import plot_duplicates
+from keras.preprocessing import image
 
 phasher = PHash()
 
@@ -74,8 +75,13 @@ def remove_duplicates(file_path):
 
 
 if __name__ == '__main__':
-    # extract_frame("benghuaianime.mp4", 5, "1450")
-    str = "ysjmhT19F481.jpg"
-    split = re.split('[TF.]',str)[len(re.split('[TF.]',str))-3]
-    print(split)
+    url = 'http://8.131.87.31:9000/picture/timg67.jpg'
+    cap = cv2.VideoCapture(url)
+    ret = cap.isOpened()
+    while (ret):
+        ret, img = cap.read()
+        if not ret: break
+        cv2.imshow('photo', img)
+        cv2.waitKey(0)
+    cap.release()
 
