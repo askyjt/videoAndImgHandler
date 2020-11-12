@@ -2,6 +2,7 @@ import os
 import re
 import cv2
 from imagededup.methods import PHash
+import common.const as const
 from imagededup.utils import plot_duplicates
 from keras.preprocessing import image
 
@@ -13,7 +14,7 @@ def extract_frame(file_path, fps, video_name):
     count, frame_count = 0, 0
     (path, filename) = os.path.split(file_path)
     print(path)
-    save_path = path + "/keyframe"
+    save_path = const.default_cache_dir + "/keyframe"
     cap = cv2.VideoCapture(file_path)
     # 帧数
     frame = cap.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -30,9 +31,9 @@ def extract_frame(file_path, fps, video_name):
         frame_count += 1
         if count % (int(frame_rate / fps)) == 0:
             # cv2.resize(image,())
-            cv2.imwrite(save_path + "/%s/%sT%dF%d.jpg" % (video_name, video_name, frame_count / frame_rate, frame_count), image)
-            print("wrote a extract_frame: " + save_path + "/%s/%sT%dF%d.jpg" % (
-                video_name, video_name, frame_count / frame_rate, frame_count), "duration_time: " + str(int(frame_count / frame_rate)))
+            cv2.imwrite(save_path + "/%s/T%dF%d.jpg" % (video_name, frame_count / frame_rate, frame_count), image)
+            print("wrote a extract_frame: " + save_path + "/%s/T%dF%d.jpg" % (
+                video_name, frame_count / frame_rate, frame_count), "duration_time: " + str(int(frame_count / frame_rate)))
         success, image = cap.read()
         count += 1
         # save_status(id, STAGE_EXTRACT, count/allframes)
@@ -76,12 +77,12 @@ def remove_duplicates(file_path):
 
 if __name__ == '__main__':
     url = 'http://8.131.87.31:9000/picture/timg67.jpg'
-    cap = cv2.VideoCapture(url)
-    ret = cap.isOpened()
-    while (ret):
-        ret, img = cap.read()
-        if not ret: break
-        cv2.imshow('photo', img)
-        cv2.waitKey(0)
-    cap.release()
+    # cap = cv2.VideoCapture(url)
+    # ret = cap.isOpened()
+    # while (ret):
+    #     ret, img = cap.read()
+    #     if not ret: break
+    #     cv2.imshow('photo', img)
+    #     cv2.waitKey(0)
+    # cap.release()
 

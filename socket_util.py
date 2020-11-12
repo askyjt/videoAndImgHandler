@@ -111,12 +111,11 @@ class ServerThreading(threading.Thread):
                     print("开始插入视频数据")
                     video_path = re['parameter']['video_path'] if 'video_path' in re['parameter'] else None
                     video_name = re['parameter']['video_name'] if 'video_name' in re['parameter'] else None
-                    status, feats_ids, names, duration_time, duration = function(video_path=video_path, video_name=video_name, table_name=table_name)
+                    status, feats_ids, urls, duration_time, duration = function(video_path=video_path, video_name=video_name, table_name=table_name)
                     code = status.code
                     msg = status.message
                     print(feats_ids)
-                    print(names)
-                    result = dict(code=code, msg=msg,  data=dict(duration=duration, milvusIds=feats_ids, names=names, duration_time=duration_time))
+                    result = dict(code=code, msg=msg,  data=dict(duration=duration, milvusIds=feats_ids, url=urls, duration_time=duration_time))
             sendmsg = json.dumps(result)
             print(sendmsg)
             # 发送数据
