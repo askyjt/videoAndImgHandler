@@ -20,33 +20,40 @@ model, graph, sess = vgg_model_init.load_model()
 def get_imlist(path):
     return [os.path.join(path, f) for f in os.listdir(path) if (f.endswith('.jpg') or f.endswith('.png'))]
 
-
-def convert_path(path: str) -> str:
-    return path.replace(r'\/'.replace(os.sep, ''), os.sep)
-
-
 # 提取特征
 def feature_extract(database_path, model):
     feats = []
     names = []
-    urls = []
     img_list = get_imlist(database_path)
     model = model
     for i, img_path in enumerate(img_list):
         norm_feat = model.vgg_extract_feat(img_path)
         img_name = os.path.split(img_path)[1]
-        #成功后将图片存入minio
-        url = minio_util.put_img_to_minio(const.MINIO_BUCKET_PICTURE, img_path, prefix='keyframe')
         feats.append(norm_feat)
         names.append(img_name.encode())
-        urls.append(url)
         current = i + 1
         total = len(img_list)
         print("extracting feature from image No. %d , %d images in total" % (current, total))
+    #成功后将图片存入minio
+    urls = minio_util.put_img_to_miniobatch(const.MINIO_BUCKET_PICTURE, img_list, prefix='keyframe')
     # 将名称从byte转为str，避免json转换出错
     names = [str(name, encoding="utf8") for name in names]
     return feats, names, urls
 
+# 提取特征
+def feature_extract_batch(database_path, model):
+    img_list = get_imlist(database_path)
+    model = model
+    print("start extract feature")
+    feats, names = model.vgg_extract_feat_batch(database_path)
+    total = len(img_list)
+    print("extracting feature from %d images in total" % total)
+    #成功后将图片存入minio
+    urls = minio_util.put_img_to_miniobatch(const.MINIO_BUCKET_PICTURE, img_list, prefix='keyframe')
+    print("save keyframe to minio successful! total %d", len(urls))
+    # 将名称从byte转为str，避免json转换出错
+    names = [str(name, encoding="utf8") for name in names]
+    return feats, names, urls
 
 # 通过图片查询视频或图片
 def search_video_or_img(img_path, table_name, top_k=10):
@@ -80,9 +87,8 @@ def save_feats_batch_to_milvus(keyframe_path, table_name):
 def save_video_to_milvus(video_path, video_name, table_name=const.MILVUS_KEYFRAME_TABLE):
     client = milvus_util.milvus_client()
     frames_path, duration = extract_frame(file_path=video_path, fps=5, video_name=video_name)
-    frames_path = convert_path(frames_path)
     print(frames_path)
-    feats, names, urls = feature_extract(database_path=frames_path, model=VGGNet())
+    feats, names, urls = feature_extract_batch(database_path=frames_path, model=VGGNet())
     duration_time = [re.split('[TF.]', time)[len(re.split('[TF.]', time)) - 3] for time in names]
     status, feats_ids = milvus_util.insert_vectors(client=client, table_name=table_name, vectors=feats)
     return status, feats_ids, urls, duration_time, duration

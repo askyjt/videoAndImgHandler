@@ -64,10 +64,10 @@ def remove_duplicates(file_path):
                 duplicates[key].remove(duplicateImg)
                 duplist.remove(duplicateImg)
 
-    print('=' * 20)
-    print(duplicates)
-    print(type(duplicates))
-    print('=' * 20)
+    # print('=' * 20)
+    # print(duplicates)
+    # print(type(duplicates))
+    # print('=' * 20)
 
     # # 给定一幅图像，显示与其重复的图像
     # plot_duplicates(image_dir=file_path,

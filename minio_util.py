@@ -20,6 +20,16 @@ def put_img_to_minio(bucket_name, file_path, prefix):
     return url
 
 
+def put_img_to_miniobatch(bucket_name, file_path_list, prefix):
+    count = 0
+    urls = []
+    for i, img_path in enumerate(file_path_list):
+        url = put_img_to_minio(bucket_name,img_path,prefix)
+        count += 1
+        urls.append(url)
+    print("upload keyframe successfully! upload count: " + str(count))
+    return urls
+
 if __name__ == '__main__':
     minio_result = put_img_to_minio('picture', 'keyframe/mingrifanzhou/T97F2329.jpg', 'test')
     print(minio_result)
