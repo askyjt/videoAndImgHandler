@@ -9,7 +9,9 @@ minioclient = Minio(endpoint=const.ENDPOINT,
 
 
 def put_img_to_minio(bucket_name, file_path, prefix):
-    img_name = os.path.split(file_path)[1]
+    (path,img_name) = os.path.split(file_path)
+    path_split = re.split('[/]',path)
+    prefix = prefix + '/' + path_split[len(path_split)-1]
     img_name = prefix + '/' + img_name
     minioclient.fput_object(bucket_name=bucket_name, object_name=img_name, file_path=file_path,
                             content_type='image/jpeg')
@@ -19,5 +21,5 @@ def put_img_to_minio(bucket_name, file_path, prefix):
 
 
 if __name__ == '__main__':
-    minio_result = put_img_to_minio('picture', 'keyframe/mingrifanzhou/mingrifanzhouT97F2329.jpg', 'test')
+    minio_result = put_img_to_minio('picture', 'keyframe/mingrifanzhou/T97F2329.jpg', 'test')
     print(minio_result)
