@@ -50,7 +50,7 @@ def feature_extract_batch(database_path, model):
     print("extracting feature from %d images in total" % total)
     #成功后将图片存入minio
     urls = minio_util.put_img_to_miniobatch(const.MINIO_BUCKET_PICTURE, img_list, prefix='keyframe')
-    print("save keyframe to minio successful! total %d", len(urls))
+    print("save keyframe to minio successful! total %d" % len(urls))
     # 将名称从byte转为str，避免json转换出错
     names = [str(name, encoding="utf8") for name in names]
     return feats, names, urls
