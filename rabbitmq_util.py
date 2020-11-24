@@ -17,6 +17,7 @@ def send_message(queue, routing_key, exchange, message, exchange_type='direct'):
     channel = connection.channel()
     channel.exchange_declare(exchange=exchange, exchange_type=exchange_type, durable=True)
     channel.queue_declare(queue=queue, durable=True)
+    channel.queue_bind(exchange=exchange, queue=queue, routing_key=routing_key)
     channel.basic_publish(exchange=exchange,
                           routing_key=routing_key,
                           body=message
@@ -31,14 +32,14 @@ def receive_message(queue, routing_key, exchange, callback, exchange_type='direc
     channel.queue_declare(queue=queue, durable=True)
     channel.queue_bind(exchange=exchange, queue=queue, routing_key=routing_key)
 
-    channel.basic_consume(queue,
-                          callback
-                          )
+    channel.basic_consume(queue, callback)
     channel.start_consuming()
 
 
-def print_mq(channl, methodx, v3, bodyx):
-    print("队列名(订阅的主题名）为：%r  得到的数据为:%r  " % (methodx.routing_key, bodyx))
+def print_mq(channel, method, properties, bodyx):
+    print("队列名(订阅的主题名）为：%r  得到的数据为:%r  " % (method.routing_key, bodyx))
+    send_message("test_return_queue", "test.return", "direct", "successful get message!")
+    channel.basic_ack(delivery_tag=method.delivery_tag)
 
 if __name__ == '__main__':
     receive_message("test", "test", "direct", print_mq)
