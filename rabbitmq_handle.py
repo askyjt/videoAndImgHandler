@@ -5,6 +5,8 @@ from feature_extract import *
 from rabbitmq_util import *
 import threading
 
+#使用消息队列实现web服务和python脚本之间的通信，
+#由于性能过差暂不使用
 
 # 搜索的回调函数
 def handle_search(channel, method, properties, body):
