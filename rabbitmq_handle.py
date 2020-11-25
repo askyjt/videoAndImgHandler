@@ -10,6 +10,7 @@ import threading
 def handle_search(channel, method, properties, body):
     print(body)
     parameters = json.loads(body)
+    # parameters = json.loads(parameters)
     table_name = parameters[TABLE_NAME] if TABLE_NAME in parameters else None
     top_k = parameters[TOP_K] if TOP_K in parameters else None
     img_path = parameters[IMG_PATH] if IMG_PATH in parameters else None
@@ -27,12 +28,14 @@ def handle_search(channel, method, properties, body):
     print(json.dumps(result))
     send_message(SEARCH_QUEUE_RETURN, ROUTING_KEY_SEARCH_RETURN, EXCHANGE_DIRECT, json.dumps(result))
     channel.basic_ack(delivery_tag=method.delivery_tag)
+    print("excute successfully!")
     return json.dumps(result)
 
 
 # 保存特征数据的回调函数
 def handle_save_feats(channel, method, properties, body):
     parameters = json.loads(body)
+    # parameters = json.loads(parameters)
     print(parameters)
     table_name = parameters[TABLE_NAME] if TABLE_NAME in parameters else None
     print("开始添加数据")
@@ -52,6 +55,7 @@ def handle_save_feats(channel, method, properties, body):
 # 保存视频数据的回调函数
 def handle_save_video(channel, method, properties, body):
     parameters = json.loads(body)
+    # parameters = json.loads(parameters)
     table_name = parameters[TABLE_NAME] if TABLE_NAME in parameters else None
     print("开始插入视频数据")
     video_path = parameters[VIDEO_PATH] if VIDEO_PATH in parameters else None
