@@ -1,7 +1,11 @@
+import ctypes
+import inspect
 import socket
 import sys
 import threading
 import json
+import time
+
 import numpy as np
 from feature_extract import *
 
@@ -37,7 +41,8 @@ def main():
         except Exception as identifier:
             print(identifier)
             pass
-        pass
+        time.sleep(0.03)
+
     serversocket.close()
     pass
 
@@ -128,13 +133,28 @@ class ServerThreading(threading.Thread):
         finally:
             self._socket.close()
         print("任务结束.....")
-
+        stop_thread(self)
         pass
 
     def __del__(self):
 
         pass
 
+
+def _async_raise(tid, exctype):
+    tid = ctypes.c_long(tid)
+    if not inspect.isclass(exctype):
+        exctype = type(exctype)
+    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, ctypes.py_object(exctype))
+    if res == 0:
+        raise ValueError("invalid thread id")
+    elif res != 1:
+        ctypes.pythonapi.PyThreadState_SetAsyncExc(tid, None)
+        raise SystemError("PyThreadState_SetAsyncExc failed")
+
+
+def stop_thread(thread):
+    _async_raise(thread.ident, SystemExit)
 
 if __name__ == "__main__":
     main()

@@ -27,7 +27,7 @@ def put_img_to_miniobatch(bucket_name, file_path_list, prefix):
         url = put_img_to_minio(bucket_name,img_path,prefix)
         count += 1
         urls.append(url)
-    print("upload keyframe successfully! total %d " % str(count))
+    print("upload keyframe successfully! total %d " % count)
     return urls
 
 if __name__ == '__main__':

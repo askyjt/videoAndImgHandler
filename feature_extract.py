@@ -7,7 +7,6 @@ from common import vgg_model_init, const
 import numpy as np
 import milvus_util
 import minio_util
-import os
 from getkeyframes import *
 # 初始化VGG模型
 from vggnet import VGGNet, vgg_extract_feat
